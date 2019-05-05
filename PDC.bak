@@ -1,0 +1,35 @@
+(define (longitud lista)
+  (longitud_aux 0 lista))
+
+(define (longitud_aux num lista)
+  (cond
+    ((null? lista)
+        num)
+    (else
+        (longitud_aux (+ num 1) (cdr lista)))
+    )
+  )
+
+(define (par_orden size casilla)
+  (list (quotient (- casilla 1) size) (modulo (- casilla 1) size)
+        )
+  )
+
+(define (list_to_par_orden size lista)
+  (cond
+    ((equal? size (longitud lista))
+        (list_to_par_orden_aux size lista))
+    (else
+        '())
+    )
+  )
+
+(define (list_to_par_orden_aux size lista)
+  (cond
+    ((null? lista)
+        '())
+    (else
+        (cons (par_orden size (car lista)) (list_to_par_orden_aux size (cdr lista)))
+        )
+    )
+  )
