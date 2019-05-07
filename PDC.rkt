@@ -117,8 +117,8 @@
     )
     )
 
-;;
-;;
+;;; g
+;;; grafo de ejemplo (5x5)
 
 (define g '(((0 0) ((1 2) (2 1)))
  ((0 1) ((1 3) (2 2) (2 0)))
@@ -146,8 +146,8 @@
  ((4 3) ((3 1) (2 4) (2 2)))
  ((4 4) ((3 2) (2 3)))))
 
-;;;
-;;;
+;;; eliminar
+;;; eliminar elemento de lista
 
 (define (eliminar ele list)
   (cond
@@ -156,6 +156,9 @@
     ( else (cons (car list) (eliminar ele (cdr list))) )
     )
   )
+
+;;; append-element
+;;; inserta elemento al final de lista
 
 (define (append-element lst elem)
   (cond
@@ -168,12 +171,18 @@
     )
   )
 
+;;; miembro
+;;; verifica que un elemento exista en una lista
+
 (define (miembro ele list)
   (cond ( (null? list) '() )
         ( (equal? (car list) ele ) ele)
         (else (miembro ele (cdr list)) )
     )
   )
+
+;;; obtener_vecinos
+;;; busca los vecinos de una casilla
 
 (define (obtener_vecinos ele graph)
   (cond ( (null? graph) '() )
@@ -182,10 +191,8 @@
     )
   )
 
-;;;
-;;;---------------------------------------------------------------------------------------------------------
-;;;
-;;;
+;;; buscar_ruta, buscar_ruta_aux, buscar_nueva_ruta, buscar_nueva_ruta_aux, verificar_ruta
+;;; realiza el objetivo de PDC-Sol y PDC-Todas
 
 (define (buscar_ruta u limite grafo una_solucion)
   (buscar_ruta_aux 1 u u limite grafo una_solucion '())
@@ -197,11 +204,8 @@
         (buscar_nueva_ruta n ruta nodo limite (obtener_vecinos nodo grafo) grafo una_solucion rutas))
     (else
         (list_to_num (sqrt limite) ruta))
-        ;ruta)
     )
   )
-
-;(PDC-Sol 5 '(0 0))(PDC-Todas 5 '(0 0))
 
 (define (buscar_nueva_ruta n ruta nodo limite vecinos grafo una_solucion rutas)
   (cond
@@ -212,6 +216,35 @@
     )
   )
 
+(define (buscar_nueva_ruta_aux n ruta nodo limite vecinos grafo una_solucion rutas)
+  (cond
+    ((null? vecinos)
+        #f)
+    ((null? (miembro (car vecinos) ruta))
+      (cond
+        (una_solucion 
+            (verificar_ruta n ruta nodo limite vecinos (buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion rutas) grafo una_solucion rutas))
+        (else
+            (unir (listar(verificar_ruta n ruta nodo limite vecinos (buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion rutas) grafo una_solucion rutas)) (listar(buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))))))
+    (else
+        (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))
+    )
+  )
+
+(define (verificar_ruta n ruta nodo limite vecinos ruta2 grafo una_solucion rutas)
+  (cond
+    ((not ruta2)
+        (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))
+    ((not una_solucion)
+        ruta2)
+    (else
+        ruta2)
+    )
+  )
+
+;;; listar
+;;; convierte un #f en '() si es necesario
+
 (define (listar lst)
   (cond
     ((equal? lst #f)
@@ -220,6 +253,9 @@
         lst)
     )
   )
+
+;;; unir
+;;; une listas (vacias, ruta, conjunto de rutas) para PDC-Todas
 
 (define (unir lst1 lst2)
   (cond
@@ -240,20 +276,8 @@
     )
   )
 
-(define (buscar_nueva_ruta_aux n ruta nodo limite vecinos grafo una_solucion rutas)
-  (cond
-    ((null? vecinos)
-        #f)
-    ((null? (miembro (car vecinos) ruta))
-      (cond
-        (una_solucion 
-            (verificar_ruta n ruta nodo limite vecinos (buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion rutas) grafo una_solucion rutas))
-        (else
-            (unir (listar(verificar_ruta n ruta nodo limite vecinos (buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion rutas) grafo una_solucion rutas)) (listar(buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))))))
-    (else
-        (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))
-    )
-  )
+;;; last-element
+;;; saca elementos de la lista para retroceder en el arbol de busqueda de soluciones del grafo
 
 (define (last-element list)
   (cond
@@ -266,21 +290,7 @@
     )
   )
 
-(define (verificar_ruta n ruta nodo limite vecinos ruta2 grafo una_solucion rutas)
-  (cond
-    ((not ruta2)
-        (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))
-    ((not una_solucion)
-        ruta2)
-    (else
-        ruta2)
-    )
-  )
-
-;;;
-;;;-----------------------------------------------------------------------------------------------------------
-;;;
-;;;
+;;; PDC-Sol
 
 (define (PDC-Sol size casilla)
   (cond
@@ -291,6 +301,8 @@
     )
   )
 
+;;; PDC-Todas
+
 (define (PDC-Todas size casilla)
   (cond
     ((verificar_casilla size casilla)
@@ -299,6 +311,9 @@
         #f)
     )
   )
+
+;;; verificar_casilla
+;;; verifica si un vecino existe dentro de la matriz/tablero
 
 (define (verificar_casilla size casilla)
   (cond
@@ -309,8 +324,8 @@
     )
   )
 
-;; quicksort
-;;
+;;; quicksort_vecinos
+;;; ordena la lista de vecinos de un nodo de el que tenga menor vecinos al que tenga mas (PDC-Sol)
 
 (define (quicksort_vecinos grafo list)
   (cond
