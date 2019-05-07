@@ -204,7 +204,12 @@
 ;(PDC-Sol 5 '(0 0))(PDC-Todas 5 '(0 0))
 
 (define (buscar_nueva_ruta n ruta nodo limite vecinos grafo una_solucion rutas)
-  (buscar_nueva_ruta_aux n ruta nodo limite vecinos grafo una_solucion rutas)
+  (cond
+    (una_solucion 
+       (buscar_nueva_ruta_aux n ruta nodo limite (quicksort_vecinos grafo vecinos) grafo una_solucion rutas))
+    (else
+       (buscar_nueva_ruta_aux n ruta nodo limite vecinos grafo una_solucion rutas))
+    )
   )
 
 (define (listar lst)
@@ -304,10 +309,26 @@
     )
   )
 
+;; quicksort
+;;
+
+(define (quicksort_vecinos grafo list)
+  (cond
+    ((null? list) list)
+    (else (quicksort_vecinos_aux grafo (cdr list) (car list) '() '()))
+))
 
 
-
-
+(define (quicksort_vecinos_aux grafo lista pivote menores mayores)
+  (cond
+    ((null? lista)
+            (append (quicksort_vecinos grafo menores) (cons pivote (quicksort_vecinos grafo mayores))))
+    ((< (longitud (obtener_vecinos (car lista) grafo)) (longitud(obtener_vecinos pivote grafo)))
+            (quicksort_vecinos_aux grafo (cdr lista) pivote (cons (car lista) menores) mayores) )
+    (else
+            (quicksort_vecinos_aux grafo (cdr lista) pivote menores (cons (car lista) mayores) )
+)
+  ))
 
 
 
