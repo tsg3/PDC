@@ -225,7 +225,7 @@
         (una_solucion 
             (verificar_ruta n ruta nodo limite vecinos (buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion rutas) grafo una_solucion rutas))
         (else
-            (unir (listar(verificar_ruta n ruta nodo limite vecinos (buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion rutas) grafo una_solucion rutas)) (listar(buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))))))
+            (unir (listar(buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion rutas)) (listar(buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))))))
     (else
         (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))
     )
@@ -235,8 +235,6 @@
   (cond
     ((not ruta2)
         (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))
-    ((not una_solucion)
-        ruta2)
     (else
         ruta2)
     )
@@ -344,6 +342,4 @@
             (quicksort_vecinos_aux grafo (cdr lista) pivote menores (cons (car lista) mayores) )
 )
   ))
-
-
 
