@@ -1,9 +1,10 @@
 #lang racket/base
 (require graphics/graphics)
 
-
-  ;((draw-rectangle w) (make-posn (* i 100) 0) 100 100))
-
+;;; Funcion: PDC-paint
+;;; Entradas: numMatriz: tamano de la matriz
+;;;           solucion: solucion del problema del caballo
+;;; Salida: Interfaz de la animacion del caballo
 (define (PDC-paint numMatriz solucion)
   (cond ((< numMatriz 5)
         (display "Solucion no encontrada para el valor numerico de la matriz"))
@@ -11,37 +12,67 @@
    (pintar numMatriz solucion))))
 
 (define (pintar numMatriz solucion)
+
   (open-graphics)
   
-; nothing appears to happen, but the library is initialized...
- 
-  (define w (open-viewport "practice" (* numMatriz 100) (* numMatriz 100)))
-; viewport window appears
+  (define w (open-viewport "PDC-Paint" (* numMatriz 100) (* numMatriz 100)))
  
   (for ([i (in-range numMatriz)])
     (for ([j (in-range numMatriz)])
       ((draw-rectangle w) (make-posn (* i 100) (* j 100)) 100 100)))
 
-  
   (animar numMatriz solucion solucion w)
-  ;((draw-solid-rectangle w) (make-posn (+ (* (cadr (car solucion)) 100) 1) (+ (* (car(car solucion)) 100) 1)) 98 98 (make-rgb 1 0 1))
   )
+
+;;; Funcion: animar
+;;; Entradas: numMatriz: Tamano de la matriz
+;;;           solucion: solucion del problema del caballo que se ira recortando hasta se nula
+;;;           solucionAbsoluta: solucion COMPLETA del problema del caballo
+;;;           viewport: Ventana donde se hara la animacion
+;;; Salida: Animacion del problema del caballo
 (define (animar numMatriz solucion solucionAbsoluta viewport)
   (cond ((null? solucion)
          (display "Ya termino la animacion"))
         (else
-         ((draw-solid-rectangle viewport) (make-posn (+ (* (car (car solucion)) 100) 1) (+ (* (cadr (car solucion)) 100) 1)) 98 98 (make-rgb 1 0 1))
+         (cuadrado (car solucion) solucionAbsoluta viewport)
          (track (car solucion) solucionAbsoluta viewport)
+         (caballo (car solucion) viewport)
          (sleep 1)
          (animar numMatriz (cdr solucion) solucionAbsoluta viewport))))
           
-  
+;;; Funcion: track
+;;; Entradas: parOrden: Par ordenado referente a por cual par va de la solucion y da la condicion de parada
+;;;           solucion: solucion COMPLETA del problema del caballo
+;;;           viewport: Ventana donde se dara el rastro
+;;; Salida: Rastro que deja el caballo al moverse  
 (define (track parOrden solucion viewport)
   (cond ((equal? parOrden (car solucion))
          #t)
         (else
-         ((draw-line viewport) (make-posn (+ (* (car (car solucion)) 100) 50) (+ (* (cadr (car solucion)) 100) 50))
-                               (make-posn (+ (* (car (cadr solucion)) 100) 50) (+ (* (cadr (cadr solucion)) 100) 50))
+         ((draw-line viewport) (make-posn (+ (* (cadr (car solucion)) 100) 50) (+ (* (car (car solucion)) 100) 50))
+                               (make-posn (+ (* (cadr (cadr solucion)) 100) 50) (+ (* (car (cadr solucion)) 100) 50))
                                (make-rgb 0 0 0))
          (track parOrden (cdr solucion) viewport))))
+
+;;; Funcion: caballo
+;;; Entradas: parOrden: Par ordenado donde se pinta el caballo
+;;;           viewport: Ventana donde se pintara el caballo
+;;; Salida: Pinta el caballo en el par ordenado acordado  
+(define (caballo parOrden viewport)
+  (cond ((null? parOrden)
+         #t)
+        (else
+         ((draw-pixmap viewport) "C:\\Users\\PT\\Desktop\\GUI\\PDC.png" (make-posn(+ (* (cadr parOrden) 100) 1)(+ (* (car parOrden) 100) 1))))))
+
+;;; Funcion: cuadrado
+;;; Entradas: parOrden: Par ordenado referente a por cual par va de la solucion y da la condicion de parada
+;;;           solucion: solucion COMPLETA del problema del caballo
+;;;           viewport: Ventana donde se pintara el rastro
+;;; Salida: Pinta un cuadrado en el par ordenado acordado  
+(define (cuadrado parOrden solucion viewport)
+  (cond ((equal? parOrden (car solucion))
+         #t)
+        (else
+         ((draw-solid-rectangle viewport) (make-posn (+ (* (cadr (car solucion)) 100) 1) (+ (* (car (car solucion)) 100) 1)) 98 98 (make-rgb 1 0 1))
+         (cuadrado parOrden (cdr solucion) viewport))))
          
