@@ -75,4 +75,3 @@
         (else
          ((draw-solid-rectangle viewport) (make-posn (+ (* (cadr (car solucion)) 100) 1) (+ (* (car (car solucion)) 100) 1)) 98 98 (make-rgb 1 0 1))
          (cuadrado parOrden (cdr solucion) viewport))))
-         

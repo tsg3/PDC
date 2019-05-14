@@ -1,8 +1,17 @@
-;;; longitud y longitud_aux
-;;; calculan el largo de una lista
+#lang racket
+(require "GUI.rkt")
+
+;;; Funcion: longitud
+;;; Entradas: lista : lista de elementos 
+;;; Salida: Longitud de la lista
 
 (define (longitud lista)
   (longitud_aux 0 lista))
+
+;;; Funcion: longitud_aux
+;;; Entradas: lista : lista de elementos 
+;;;           num : cantidad de elementos contados
+;;; Salida: Longitud de la lista
 
 (define (longitud_aux num lista)
   (cond
@@ -13,20 +22,29 @@
     )
   )
 
-;;; par_orden
-;;; calcula el par ordenado de una casilla en relacion al tamaño de la matriz
+;;; Funcion: par_orden
+;;; Entradas: size : tamaño de la matriz que se esté usando
+;;;           casilla : numero de la casilla
+;;; Salida: Convierte un numero de casilla a par ordenado
 
 (define (par_orden size casilla)
   (list (quotient (- casilla 1) size) (modulo (- casilla 1) size)
         )
   )
 
+;;; Funcion: num
+;;; Entradas: size : tamaño de la matriz que se esté usando 
+;;;           casilla : par ordenado de la casilla
+;;; Salida: Convierte un par ordenado a un numero de casilla
+
 (define (num size casilla)
   (+ (* size (car casilla)) (cadr casilla) 1)
   )
 
-;;; list_to_par_orden
-;;; convierten una lista de casillas a una lista de pares ordenados
+;;; Funcion: list_to_par_orden
+;;; Entradas: size : tamaño de la matriz que se esté usando 
+;;;           lista : lista de numeros
+;;; Salida: Convierte una lista de numeros a una lista de pares ordenados
 
 (define (list_to_par_orden size lista)
   (cond
@@ -38,6 +56,11 @@
     )
   )
 
+;;; Funcion: list_to_num
+;;; Entradas: size : tamaño de la matriz que se esté usando 
+;;;           lista : lista de pares ordenados
+;;; Salida: Convierte una lista de pares ordenados a una lista de numeros de casilla
+
 (define (list_to_num size lista)
   (cond
     ((null? lista)
@@ -48,13 +71,19 @@
     )
   )
 
-;;; crear_vecinos
-;;; busca los vecinos validos de una casilla
+;;; Funcion: vecinos
+;;; Entradas: par : par ordenado
+;;; Salida: Lista con los vecinos de una casilla con respecto al movimiento del caballo
 
 (define (vecinos par)
   (vecinos_aux '((1 2) (1 -2) (-1 2) (-1 -2) (2 1) (2 -1) (-2 1) (-2 -1)) par
                )
   )
+
+;;; Funcion: vecinos
+;;; Entradas: movimientos : movimientos de un caballo de ajedrez
+;;;           par : par ordenado
+;;; Salida: Lista con los movimientos posibles de una casilla
 
 (define (vecinos_aux movimientos par)
   (cond
@@ -66,8 +95,10 @@
     )
   )
 
-;;; verificar_movimientos
-;;; elimina los vecinos de una casilla que estan fuera de la matriz
+;;; Funcion: verificar_movimientos
+;;; Entradas: size : Tamaño de la matriz que se está usando
+;;;           movimientos : vecinos de una casilla por el movimiento del caballo
+;;; Salida: Elimina los vecinos de una casilla que se encuentren fuera del tablero
 
 (define (verificar_movimientos size movimientos)
   (cond
@@ -83,19 +114,29 @@
     )
   )
 
-;;; crear_vecinos
-;;; crea los vecinos validos de una casilla
+;;; Funcion: verificar_movimientos
+;;; Entradas: size : Tamaño de la matriz que se está usando
+;;;           casilla : par ordenado de la casilla
+;;; Salida: Lista con los vecinos válidos de una casilla
 
 (define (crear_vecinos size casilla)
   (verificar_movimientos size (vecinos casilla))
   )
 
-;;; crear_tablero
-;;; crea el grafo que relaciona a las casillas del tablero
+;;; Funcion: crear_tablero
+;;; Entradas: size : Tamaño de la matriz que se está usando
+;;;           casilla : par ordenado de la casilla
+;;;           una_solucion : bandera que determina si se buscan una (#t) o todas las soluciones (#f)
+;;; Salida: Ruta o rutas encontradas como solucion para la casilla
 
 (define (crear_tablero size casilla una_solucion)
   (buscar_ruta casilla (* size size) (crear_grafo size (list_to_par_orden size (crear_tablero_aux (* size size) 1))) una_solucion)
   )
+
+;;; Funcion: crear_tablero_aux
+;;; Entradas: size : Tamaño de la matriz que se está usando
+;;;           casilla : par ordenado de la casilla
+;;; Salida: Lista con todas las casillas para un tablero de tamaño size.
 
 (define (crear_tablero_aux size casilla)
   (cond
@@ -107,6 +148,11 @@
     )
   )
 
+;;; Funcion: crear_grafo
+;;; Entradas: size : Tamaño de la matriz que se está usando
+;;;           tablero : lista con las casillas en pares ordenados de un tablero
+;;; Salida: Grafo que representa las interconexiones entre todas las casillas del tablero
+
 (define (crear_grafo size tablero)
   (cond
     ((null? tablero)
@@ -117,37 +163,10 @@
     )
     )
 
-;;; g
-;;; grafo de ejemplo (5x5)
-
-(define g '(((0 0) ((1 2) (2 1)))
- ((0 1) ((1 3) (2 2) (2 0)))
- ((0 2) ((1 4) (1 0) (2 3) (2 1)))
- ((0 3) ((1 1) (2 4) (2 2)))
- ((0 4) ((1 2) (2 3)))
- ((1 0) ((2 2) (0 2) (3 1)))
- ((1 1) ((2 3) (0 3) (3 2) (3 0)))
- ((1 2) ((2 4) (2 0) (0 4) (0 0) (3 3) (3 1)))
- ((1 3) ((2 1) (0 1) (3 4) (3 2)))
- ((1 4) ((2 2) (0 2) (3 3)))
- ((2 0) ((3 2) (1 2) (4 1) (0 1)))
- ((2 1) ((3 3) (1 3) (4 2) (4 0) (0 2) (0 0)))
- ((2 2) ((3 4) (3 0) (1 4) (1 0) (4 3) (4 1) (0 3) (0 1)))
- ((2 3) ((3 1) (1 1) (4 4) (4 2) (0 4) (0 2)))
- ((2 4) ((3 2) (1 2) (4 3) (0 3)))
- ((3 0) ((4 2) (2 2) (1 1)))
- ((3 1) ((4 3) (2 3) (1 2) (1 0)))
- ((3 2) ((4 4) (4 0) (2 4) (2 0) (1 3) (1 1)))
- ((3 3) ((4 1) (2 1) (1 4) (1 2)))
- ((3 4) ((4 2) (2 2) (1 3)))
- ((4 0) ((3 2) (2 1)))
- ((4 1) ((3 3) (2 2) (2 0)))
- ((4 2) ((3 4) (3 0) (2 3) (2 1)))
- ((4 3) ((3 1) (2 4) (2 2)))
- ((4 4) ((3 2) (2 3)))))
-
-;;; eliminar
-;;; eliminar elemento de lista
+;;; Funcion: eliminar
+;;; Entradas: ele : elemento
+;;;           list : lista de elementos
+;;; Salida: Retorna la lista list sin el elemento ele
 
 (define (eliminar ele list)
   (cond
@@ -157,8 +176,10 @@
     )
   )
 
-;;; append-element
-;;; inserta elemento al final de lista
+;;; Funcion: element
+;;; Entradas: lst : lista
+;;;           elem : elemento
+;;; Salida: Concatena al final de la lista lst, el elemento elem
 
 (define (append-element lst elem)
   (cond
@@ -171,8 +192,10 @@
     )
   )
 
-;;; miembro
-;;; verifica que un elemento exista en una lista
+;;; Funcion: element
+;;; Entradas: ele : lista
+;;;           list : elemento
+;;; Salida: Verifica si ele es miembro de la lista list
 
 (define (miembro ele list)
   (cond ( (null? list) '() )
@@ -181,8 +204,10 @@
     )
   )
 
-;;; obtener_vecinos
-;;; busca los vecinos de una casilla
+;;; Funcion: obtener_vecinos
+;;; Entradas: ele : casilla del tablero
+;;;           graph : grafo
+;;; Salida: Busca los vecinos de ele en el grafo graph
 
 (define (obtener_vecinos ele graph)
   (cond ( (null? graph) '() )
@@ -191,57 +216,102 @@
     )
   )
 
-;;; buscar_ruta, buscar_ruta_aux, buscar_nueva_ruta, buscar_nueva_ruta_aux, verificar_ruta
-;;; realiza el objetivo de PDC-Sol y PDC-Todas
+;;; Funcion: buscar_ruta
+;;; Entradas: u : casilla del tablero
+;;;           limite : cantidad de casillas del tablero
+;;;           grafo : grafo correspondiente al tablero
+;;;           una_solucion : bandera que determina si se buscan una (#t) o todas las soluciones (#f)
+;;; Salida: Retorna la ruta/las rutas como solución al problema
 
 (define (buscar_ruta u limite grafo una_solucion)
-  (buscar_ruta_aux 1 u u limite grafo una_solucion '())
+  (buscar_ruta_aux 1 u u limite grafo una_solucion)
   )
 
-(define (buscar_ruta_aux n ruta nodo limite grafo una_solucion rutas)
+;;; Funcion: buscar_ruta_aux
+;;; Entradas: n : cantidad de casillas visitadas
+;;;           ruta : camino recorrido hasta la casilla actual
+;;;           nodo : casilla del tablero
+;;;           limite : cantidad de casillas del tablero
+;;;           grafo : grafo correspondiente al tablero
+;;;           una_solucion : bandera que determina si se buscan una (#t) o todas las soluciones (#f)
+;;; Salida: Busca los vecinos del nodo o retorna la ruta si n = limite
+
+(define (buscar_ruta_aux n ruta nodo limite grafo una_solucion)
   (cond
     ((< n limite)
-        (buscar_nueva_ruta n ruta nodo limite (obtener_vecinos nodo grafo) grafo una_solucion rutas))
+        (buscar_nueva_ruta n ruta nodo limite (obtener_vecinos nodo grafo) grafo una_solucion))
     (else
         (list_to_num (sqrt limite) ruta))
     )
   )
 
-(define (buscar_nueva_ruta n ruta nodo limite vecinos grafo una_solucion rutas)
+;;; Funcion: buscar_nueva_ruta
+;;; Entradas: n : cantidad de casillas visitadas
+;;;           ruta : camino recorrido hasta la casilla actual
+;;;           nodo : casilla del tablero
+;;;           limite : cantidad de casillas del tablero
+;;;           vecinos : vecinos de nodo
+;;;           grafo : grafo correspondiente al tablero
+;;;           una_solucion : bandera que determina si se buscan una (#t) o todas las soluciones (#f)
+;;; Salida: Busca si es posible encontrar una ruta en los vecinos 
+
+(define (buscar_nueva_ruta n ruta nodo limite vecinos grafo una_solucion)
   (cond
     (una_solucion 
-       (buscar_nueva_ruta_aux n ruta nodo limite (quicksort_vecinos grafo vecinos) grafo una_solucion rutas))
+       (buscar_nueva_ruta_aux n ruta nodo limite (quicksort_vecinos grafo vecinos) grafo una_solucion))
     (else
-       (buscar_nueva_ruta_aux n ruta nodo limite vecinos grafo una_solucion rutas))
+       (buscar_nueva_ruta_aux n ruta nodo limite vecinos grafo una_solucion))
     )
   )
 
-(define (buscar_nueva_ruta_aux n ruta nodo limite vecinos grafo una_solucion rutas)
+;;; Funcion: buscar_nueva_ruta_aux
+;;; Entradas: n : cantidad de casillas visitadas
+;;;           ruta : camino recorrido hasta la casilla actual
+;;;           nodo : casilla del tablero
+;;;           limite : cantidad de casillas del tablero
+;;;           vecinos : vecinos de nodo
+;;;           grafo : grafo correspondiente al tablero
+;;;           una_solucion : bandera que determina si se buscan una (#t) o todas las soluciones (#f)
+;;; Salida: Busca rutas en los vecinos del nodo. Retorna #f si no encontró una ruta.
+
+(define (buscar_nueva_ruta_aux n ruta nodo limite vecinos grafo una_solucion)
   (cond
     ((null? vecinos)
         #f)
     ((null? (miembro (car vecinos) ruta))
       (cond
         (una_solucion 
-            (verificar_ruta n ruta nodo limite vecinos (buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion rutas) grafo una_solucion rutas))
+            (verificar_ruta n ruta nodo limite vecinos (buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion) grafo una_solucion))
         (else
-            (unir (listar(buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion rutas)) (listar(buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))))))
+            (unir (listar(buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion)) (listar(buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion))))))
     (else
-        (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))
+        (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion))
     )
   )
 
-(define (verificar_ruta n ruta nodo limite vecinos ruta2 grafo una_solucion rutas)
+;;; Funcion: verificar_ruta
+;;; Entradas: n : cantidad de casillas visitadas
+;;;           ruta : camino recorrido hasta la casilla actual
+;;;           nodo : casilla del tablero
+;;;           limite : cantidad de casillas del tablero
+;;;           vecinos : vecinos de nodo
+;;;           ruta2 : ruta encontrada ( '() si no encontró ninguna)
+;;;           grafo : grafo correspondiente al tablero
+;;;           una_solucion : bandera que determina si se buscan una (#t) o todas las soluciones (#f)
+;;; Salida: Busca en los otros vecinos si no encontró una ruta (backtracking para PDC-Sol)
+
+(define (verificar_ruta n ruta nodo limite vecinos ruta2 grafo una_solucion)
   (cond
     ((not ruta2)
-        (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion rutas))
+        (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion))
     (else
         ruta2)
     )
   )
 
-;;; listar
-;;; convierte un #f en '() si es necesario
+;;; Funcion: listar
+;;; Entradas: lst : lista de elementos o #f
+;;; Salida: Convierte lst en una lista vacía si su valor es #f
 
 (define (listar lst)
   (cond
@@ -252,8 +322,9 @@
     )
   )
 
-;;; unir
-;;; une listas (vacias, ruta, conjunto de rutas) para PDC-Todas
+;;; Funcion: unir
+;;; Entradas: lst1, lst2 : listas de rutas
+;;; Salida: concatena listas
 
 (define (unir lst1 lst2)
   (cond
@@ -274,8 +345,9 @@
     )
   )
 
-;;; last-element
-;;; saca elementos de la lista para retroceder en el arbol de busqueda de soluciones del grafo
+;;; Funcion: last-element
+;;; Entradas: lst : lista de elementos
+;;; Salida: Obtiene el ultimo elemento de una lista
 
 (define (last-element list)
   (cond
@@ -288,7 +360,10 @@
     )
   )
 
-;;; PDC-Sol
+;;; Funcion: PDC-Sol
+;;; Entradas: size : tamaño de la matriz que se quiere usar
+;;;           casilla : casilla del tablero
+;;; Salida: Busca una solucion para el problema del caballo en la casilla
 
 (define (PDC-Sol size casilla)
   (cond
@@ -299,7 +374,10 @@
     )
   )
 
-;;; PDC-Todas
+;;; Funcion: PDC-Sol
+;;; Entradas: size : tamaño de la matriz que se quiere usar
+;;;           casilla : casilla del tablero
+;;; Salida: Busca todas las soluciones para el problema del caballo en la casilla
 
 (define (PDC-Todas size casilla)
   (cond
@@ -310,8 +388,10 @@
     )
   )
 
-;;; verificar_casilla
-;;; verifica si un vecino existe dentro de la matriz/tablero
+;;; Funcion: verificar_casilla
+;;; Entradas: size : tamaño de la matriz que se quiere usar
+;;;           casilla : casilla del tablero
+;;; Salida: Verifica si la casilla pertenece a un tablero de tamaño 'size' * 'size'
 
 (define (verificar_casilla size casilla)
   (cond
@@ -322,8 +402,14 @@
     )
   )
 
-;;; quicksort_vecinos
-;;; ordena la lista de vecinos de un nodo de el que tenga menor vecinos al que tenga mas (PDC-Sol)
+;;; Funcion: quicksort_vecinos, quicksort_vecinos_aux
+;;; Entradas: grafo : grafo que se está usando 
+;;;           list : lista de elementosa ordenar
+;;;           lista : lista de vecinos para comparar
+;;;           pivote : elemento que se usa para comparar los demás elementos
+;;;           menores : lista con vecinos con menor cantidad de vecinos que el pivote
+;;;           mayores : lista con vecinos con mayor cantidad de vecinos que el pivote
+;;; Salida: Ordena una lista de vecinos del que tenga menor cantidad de vecinos a mayor cantidad
 
 (define (quicksort_vecinos grafo list)
   (cond
@@ -343,3 +429,136 @@
 )
   ))
 
+;;; PDC-Test
+;;; Entradas: size: tamano de la matriz solucion
+;;; 					solucion: solucion en una lista del probelma del caballo
+;;; Salida: la matriz solucion si existe y #f si no
+
+(define (PDC-Test size solucion)
+  (cond
+    ((is_valida size solucion) (sol_to_matrix size solucion))
+     (else #f)
+    )
+  )
+
+;;; is_valida
+;;; Entradas: size: tamano de la matriz solucion
+;;; 					solucion: solucion en una lista del probelma del caballo
+;;; Salida: #t si la sulucion es valida y #f si no
+
+(define (is_valida size solucion)
+  (cond
+    ((and (= (longitud solucion) (* size size)) (is_valida_aux solucion '()) (is_valida_aux2 size (list_to_par_orden size solucion)))
+     #t)
+    (else
+     #f)
+   )
+  )
+
+;;; is_valida_aux
+;;; Entradas: solucion a verificar y lista vacia
+;;; Salida: #t si no se repiten elementos en la solucion
+;;;         #f si se repiten elementos en la solucion
+
+(define (is_valida_aux solucion list)
+  (cond
+    ((null? solucion)
+     #t)
+    ((member (car solucion) list)
+     #f)
+    (else
+     (is_valida_aux (cdr solucion) (cons (car solucion) list) ))
+    )
+  )
+
+;;; is_valida_aux2
+;;; Entradas: tamano del tablero y la solucion a verificar
+;;; Salida: #t si los movimientos de la solcuion son de caballo y no se salen del tablero
+;;;         #f si no cumple con lo dicho
+
+(define (is_valida_aux2 size solucion)
+  (cond
+    ((= (longitud solucion) 2)
+     (cond
+           ((and (< (+ (caar solucion) 1) 5) (< (+ (cadar solucion) 2) 5) (= (+ (caar solucion) 1) (caadr solucion)) (= (+ (cadar solucion) 2) (cadadr solucion))) #t)
+           ((and (< (+ (caar solucion) 1) 5) (> (+ (cadar solucion) -2) -1) (= (+ (caar solucion) 1) (caadr solucion)) (= (+ (cadar solucion) -2) (cadadr solucion))) #t)
+           ((and (> (+ (caar solucion) -1) -1) (< (+ (cadar solucion) 2) 5) (= (+ (caar solucion) -1) (caadr solucion)) (= (+ (cadar solucion) 2) (cadadr solucion))) #t)
+           ((and (> (+ (caar solucion) -1) -1) (> (+ (cadar solucion) -2) -1) (= (+ (caar solucion) -1) (caadr solucion)) (= (+ (cadar solucion) -2) (cadadr solucion))) #t)
+           ((and (< (+ (caar solucion) 2) 5) (< (+ (cadar solucion) 1) 5) (= (+ (caar solucion) 2) (caadr solucion)) (= (+ (cadar solucion) 1) (cadadr solucion))) #t)
+           ((and (< (+ (caar solucion) 2) 5) (> (+ (cadar solucion) -1) -1) (= (+ (caar solucion) 2) (caadr solucion)) (= (+ (cadar solucion) -1) (cadadr solucion))) #t)
+           ((and (> (+ (caar solucion) -2) -1) (< (+ (cadar solucion) 1) 5) (= (+ (caar solucion) -2) (caadr solucion)) (= (+ (cadar solucion) 1) (cadadr solucion))) #t)
+           ((and (> (+ (caar solucion) -2) -1) (> (+ (cadar solucion) -1) -1) (= (+ (caar solucion) -2) (caadr solucion)) (= (+ (cadar solucion) -1) (cadadr solucion))) #t)
+           (else #f)
+       )
+     )
+    ((and (< (+ (caar solucion) 1) 5) (< (+ (cadar solucion) 2) 5) (= (+ (caar solucion) 1) (caadr solucion)) (= (+ (cadar solucion) 2) (cadadr solucion)) )
+     (is_valida_aux2 size (cdr solucion)))
+    
+    ((and (< (+ (caar solucion) 1) 5) (> (+ (cadar solucion) -2) -1) (= (+ (caar solucion) 1) (caadr solucion)) (= (+ (cadar solucion) -2) (cadadr solucion)) )
+     (is_valida_aux2 size (cdr solucion)))
+    
+    ((and (> (+ (caar solucion) -1) -1) (< (+ (cadar solucion) 2) 5) (= (+ (caar solucion) -1) (caadr solucion)) (= (+ (cadar solucion) 2) (cadadr solucion)) )
+     (is_valida_aux2 size (cdr solucion)))
+    
+    ((and (> (+ (caar solucion) -1) -1) (> (+ (cadar solucion) -2) -1) (= (+ (caar solucion) -1) (caadr solucion)) (= (+ (cadar solucion) -2) (cadadr solucion)) )
+     (is_valida_aux2 size (cdr solucion)))
+    
+    ((and (< (+ (caar solucion) 2) 5) (< (+ (cadar solucion) 1) 5) (= (+ (caar solucion) 2) (caadr solucion)) (= (+ (cadar solucion) 1) (cadadr solucion)) )
+     (is_valida_aux2 size (cdr solucion)))
+    
+    ((and (< (+ (caar solucion) 2) 5) (> (+ (cadar solucion) -1) -1) (= (+ (caar solucion) 2) (caadr solucion)) (= (+ (cadar solucion) -1) (cadadr solucion)) )
+     (is_valida_aux2 size (cdr solucion)))
+    
+    ((and (> (+ (caar solucion) -2) -1) (< (+ (cadar solucion) 1) 5) (= (+ (caar solucion) -2) (caadr solucion)) (= (+ (cadar solucion) 1) (cadadr solucion)) )
+     (is_valida_aux2 size (cdr solucion)))
+    
+    ((and (> (+ (caar solucion) -2) -1) (> (+ (cadar solucion) -1) -1) (= (+ (caar solucion) -2) (caadr solucion)) (= (+ (cadar solucion) -1) (cadadr solucion)) )
+     (is_valida_aux2 size (cdr solucion)))
+    
+    (else
+     #f)
+   )
+  )
+
+;;; sol_to_matrix
+;;; Entradas: tamano del tablero y la solucion ya verificada
+;;; Salida: la matriz de la sulucion
+
+(define (sol_to_matrix size solucion)
+  (display_matrix 1  (* size size) (sol_to_matrix_aux 1 (* size size) solucion))
+  )
+
+;;; sol_to_matrix_aux
+;;; Entradas: un contador el num de casillas del tablero y la solucion
+;;; Salida: la traducion de la matriz pero en una sola linea
+
+(define (sol_to_matrix_aux contador size solucion)
+  (cond
+   ((> contador size) '())
+   (else (cons (busca_num contador 1 solucion) (sol_to_matrix_aux (+ contador 1) size solucion) ))
+   )
+  )
+
+;;; busca_num
+;;; Entradas: dos contadores que buscan la posicision de los movimientos y la solucion
+;;; Salida: la posicion del movimiento en el tablero
+
+(define (busca_num contador contador2 solucion)
+  (cond
+    ((= contador (car solucion)) contador2)
+    (else (busca_num contador (+ contador2 1) (cdr solucion)))
+    )
+  )
+
+;;; display_matrix
+;;; Entradas: contador, num de casillas en la matriz y la matriz como lista
+;;; Salida: la matriz en el display
+
+(define (display_matrix num size matrix)
+  (cond
+    ((= size 0) (display " "))
+    ((= num 1) (display "| ") (display (car matrix)) (display " | ") (display_matrix (+ num 1) (- size 1) (cdr matrix)))
+    ((> num 5) (display "\n") (display_matrix 1 size matrix))
+    (else (display (car matrix)) (display " | ") (display_matrix (+ num 1) (- size 1) (cdr matrix)))
+    )
+  )
