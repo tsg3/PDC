@@ -90,7 +90,9 @@
     ((null? movimientos)
         '())
     (else
-     (cons (list (+ (car par) (caar movimientos)) (+ (cadr par) (cadar movimientos))) (vecinos_aux (cdr movimientos) par))
+     (cons
+      (list (+ (car par) (caar movimientos)) (+ (cadr par) (cadar movimientos)))
+      (vecinos_aux (cdr movimientos) par))
      )
     )
   )
@@ -130,7 +132,10 @@
 ;;; Salida: Ruta o rutas encontradas como solucion para la casilla
 
 (define (crear_tablero size casilla una_solucion)
-  (buscar_ruta casilla (* size size) (crear_grafo size (list_to_par_orden size (crear_tablero_aux (* size size) 1))) una_solucion)
+  (buscar_ruta casilla
+               (* size size)
+               (crear_grafo size (list_to_par_orden size (crear_tablero_aux (* size size) 1)))
+               una_solucion)
   )
 
 ;;; Funcion: crear_tablero_aux
@@ -158,7 +163,9 @@
     ((null? tablero)
         '())
     (else
-        (cons (list (car tablero) (crear_vecinos size (car tablero))) (crear_grafo size (cdr tablero)))
+        (cons
+         (list (car tablero) (crear_vecinos size (car tablero)))
+         (crear_grafo size (cdr tablero)))
         )
     )
     )
@@ -281,9 +288,20 @@
     ((null? (miembro (car vecinos) ruta))
       (cond
         (una_solucion 
-            (verificar_ruta n ruta nodo limite vecinos (buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion) grafo una_solucion))
+            (verificar_ruta n ruta nodo limite vecinos
+                            (buscar_ruta_aux (+ n 1)
+                                             (append-element ruta (car vecinos))
+                                             (car vecinos)
+                                             limite
+                                             grafo
+                                             una_solucion)
+                            grafo una_solucion))
         (else
-            (unir (listar(buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion)) (listar(buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion))))))
+            (unir
+             (listar
+              (buscar_ruta_aux (+ n 1) (append-element ruta (car vecinos)) (car vecinos) limite grafo una_solucion))
+             (listar
+              (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion))))))
     (else
         (buscar_nueva_ruta_aux n ruta nodo limite (cdr vecinos) grafo una_solucion))
     )
@@ -448,10 +466,13 @@
 
 (define (is_valida size solucion)
   (cond
-    ((and (= (longitud solucion) (* size size)) (is_valida_aux solucion '()) (is_valida_aux2 size (list_to_par_orden size solucion)))
-     #t)
+    ((and
+      (= (longitud solucion) (* size size))
+      (is_valida_aux solucion '())
+      (is_valida_aux2 size (list_to_par_orden size solucion)))
+        #t)
     (else
-     #f)
+        #f)
    )
   )
 

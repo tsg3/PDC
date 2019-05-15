@@ -63,7 +63,7 @@
   (cond ((null? parOrden)
          #t)
         (else
-         ((draw-pixmap viewport) "C:\\Users\\PT\\Desktop\\GUI\\PDC.png" (make-posn(+ (* (cadr parOrden) 100) 1)(+ (* (car parOrden) 100) 1))))))
+         ((draw-pixmap viewport) "C:\\Users\\PT\\Desktop\\PDC\\PDC.png" (make-posn(+ (* (cadr parOrden) 100) 1)(+ (* (car parOrden) 100) 1))))))
 
 ;;; Funcion: cuadrado
 ;;; Entradas: parOrden: Par ordenado referente a por cual par va de la solucion y da la condicion de parada
